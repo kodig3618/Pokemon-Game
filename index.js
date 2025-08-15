@@ -38,6 +38,8 @@ const keys = {
     d: {pressed: false}
 }
 
+let keyPressOrder = [];
+
 function animate() {
     window.requestAnimationFrame(animate);
     background.draw();
@@ -53,6 +55,8 @@ function animate() {
         playerImage.height
     )
 
+    const lastKey = keyPressOrder[keyPressOrder.length - 1];
+
     if (keys.w.pressed && lastKey === 'w') background.position.y += 3;
     if (keys.a.pressed && lastKey === 'a') background.position.x += 3;
     if (keys.s.pressed && lastKey === 's') background.position.y -= 3;
@@ -61,44 +65,30 @@ function animate() {
 }
 animate();
 
-let lastKey = '';
 window.addEventListener('keydown', (e) => {
     switch (e.key.toLowerCase()) {
         case 'w':
-            keys.w.pressed = true;
-            lastKey = 'w';
-            break;
         case 'a':
-            keys.a.pressed = true;
-            lastKey = 'a';
-            break;
         case 's':
-            keys.s.pressed = true;
-            lastKey = 's';
-            break;
         case 'd':
-            keys.d.pressed = true;
-            lastKey = 'd';
-            break;
+            if (!keys[key].pressed) {  // Only add if not already pressed
+                keys[key].pressed = true;
+                // Remove key if it exists, then add to end
+                keyPressOrder = keyPressOrder.filter(k => k !== key);
+                keyPressOrder.push(key);
+            }
     }
 });
 
 window.addEventListener('keyup', (e) => {
-    switch (e.key) {
+    switch (e.key.toLowerCase) {
         case 'w':
-            keys.w.pressed = false;
-            break;
-
         case 'a':
-            keys.a.pressed = false;
-            break;
-
-        case 's':
-            keys.s.pressed = false;
-            break;
-            
+        case 's':        
         case 'd':
-            keys.d.pressed = false;
+            keys[key].pressed = false;
+            // Remove the key from the press order
+            keyPressOrder = keyPressOrder.filter(k => k !== key);
             break;
     }
 })
