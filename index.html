@@ -3,14 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokemone-Game</title>
-    <script src="index.js"></script>
+    <title>Pokemon Game</title>
     <style>
         body {
-            background-color : black;
-
+            background-color: black;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
+        
+        canvas {
+            border: 2px solid #333;
+            background-color: white;
+        }
+
     </style>
 </head>
 </html>
-<canvas></canvas>
+<body>
+    <canvas id = "gameCanvas"></canvas>
+    <script src="index.js"></script>
+</body>
