@@ -5,10 +5,6 @@ const ctx = canvas.getContext('2d');
 canvas.width = 1024;
 canvas.height = 576;
 
-// Constants
-const TILE_SIZE = 48;
-const PLAYER_SPEED = 3;
-const MAP_COLS = 70;
 
 // Convert collision array to 2D map
 const collisionsMap = [];
@@ -41,8 +37,20 @@ collisionsMap.forEach((row, i) => {
 const mapImage = new Image();
 mapImage.src = './img/Town.png';
 
+const foregroundImage = new Image();
+foregroundImage.src = './img/foregroundObjects.png';
+
 const playerImage = new Image();
 playerImage.src = './img/playerDown.png';
+
+const playerUpImage = new Image();
+playerImage.src = './img/playerUp.png';
+
+const playerRightImage = new Image();
+playerImage.src = './img/playerRight.png';
+
+const playerLeftImage = new Image();
+playerImage.src = './img/playerLeft.png';
 
 // Create sprites
 const background = new Sprite({
@@ -54,11 +62,11 @@ const background = new Sprite({
 });
 
 const foreground = new Sprite({
-    position: {
+    position: { 
         x: offset.x,
         y: offset.y
     },
-    image: image
+    image: foregroundImage,
 });
 
 const player = new Sprite({
@@ -69,6 +77,12 @@ const player = new Sprite({
     image: playerImage,
     frames: {
         max: 4
+    },
+    sprites: {
+        up: playerUpImage,  
+        right: playerRightImage,
+        down: playerImage,
+        left: playerLeftImage
     }
 });
 
@@ -81,7 +95,7 @@ const keys = {
 };
 
 let keyPressOrder = [];
-const moveables = [background, ...boundaries];
+const moveables = [background, ...boundaries, foreground];
 
 // Collision detection function
 function rectangularCollision({ rectangle1, rectangle2 }) {
@@ -129,23 +143,33 @@ function animate() {
     background.draw();
     boundaries.forEach(boundary => boundary.draw());
     player.draw();
+    foreground.draw();
 
     // Handle movement
     const lastKey = keyPressOrder[keyPressOrder.length - 1];
 
+    player.moving = false;
     if (keys.w.pressed && lastKey === 'w') {
+        player.moving = true;
+        player.image = player.sprites.up;
         if (!wouldCollide(0, PLAYER_SPEED)) {
             moveObjects(0, PLAYER_SPEED);
         }
     } else if (keys.a.pressed && lastKey === 'a') {
+        player.moving = true;
+        player.image = player.sprites.left;
         if (!wouldCollide(PLAYER_SPEED, 0)) {
             moveObjects(PLAYER_SPEED, 0);
         }
     } else if (keys.s.pressed && lastKey === 's') {
+        player.moving = true;
+        player.image = player.sprites.down;
         if (!wouldCollide(0, -PLAYER_SPEED)) {
             moveObjects(0, -PLAYER_SPEED);
         }
     } else if (keys.d.pressed && lastKey === 'd') {
+        player.moving = true;
+        player.image = player.sprites.right;
         if (!wouldCollide(-PLAYER_SPEED, 0)) {
             moveObjects(-PLAYER_SPEED, 0);
         }
