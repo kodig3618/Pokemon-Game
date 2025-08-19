@@ -115,7 +115,7 @@ const keys = {
 };
 
 let keyPressOrder = [];
-const moveables = [background, ...boundaries, foreground];
+const moveables = [background, ...boundaries, foreground, ...battleZones];
 
 // Collision detection function
 function rectangularCollision({ rectangle1, rectangle2 }) {
@@ -166,6 +166,27 @@ battleZones.forEach(battleZones => battleZones.draw());
 player.draw();
 foreground.draw();
 
+if (keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
+    for (let i = 0; i < battleZones.length; i++) {
+        const battleZone = battleZones[i];
+        const overlappingArea = (Math.min(player.position.x + player.width, battleZone.position.x + battleZone.width) 
+        - Math.max(player.position.x, battleZone.position.x))
+        * (Math.min(player.position.y +player.height, battleZone.position.y + battleZone.height)
+        - Math.max(player.position.y, battleZone.position.y));
+             
+        if (
+            rectangularCollision({
+                rectangle1: player,
+                rectangle2: battleZone
+            }) &&
+            overlappingArea > player.width * player.height / 2
+            && Math.random() < .01 // 1% chance to trigger battle
+        ){
+            console.log('Battle Zone Entered');
+            break;
+}}
+}
+
 // Handle movement
 const lastKey = keyPressOrder[keyPressOrder.length - 1];
 
@@ -211,7 +232,6 @@ if (keys.w.pressed && lastKey === 'w') {
         moveObjects(-PLAYER_SPEED, 0);
     }
 }
-player.moving = moving;
 }
 
 // Event listeners
