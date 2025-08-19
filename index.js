@@ -1,29 +1,43 @@
-// Game setup
+// ============================================
+// GAME INITIALIZATION
+// ============================================
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+gsap.to('#overlappingDiv', {
+    opacity: 1,
+    repeat: 3,
+    yoyo: true,
+    duration: 0.4,
+})
 
 canvas.width = 1024;
 canvas.height = 576;
 
-
-// Convert collision array to 2D map
+// ============================================
+// MAP DATA PROCESSING
+// ============================================
+// Convert 1D collision array to 2D map
 const collisionsMap = [];
 for (let i = 0; i < collisions.length; i += MAP_COLS) {
     collisionsMap.push(collisions.slice(i, i + MAP_COLS));
 }
 
+// Convert 1D battle zones array to 2D map
 const battleZonesMap = [];
 for (let i = 0; i < battleZonesData.length; i += MAP_COLS) {
     battleZonesMap.push(battleZonesData.slice(i, i + MAP_COLS));
 }
 
-// Game objects
+// ============================================
+// GAME OBJECTS SETUP
+// ============================================
 const offset = {
     x: -305,
     y: -130
 };
 
-// Create boundaries from collision map
+// Create collision boundaries from collision map
 const boundaries = [];
 collisionsMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
@@ -38,8 +52,8 @@ collisionsMap.forEach((row, i) => {
     });
 });
 
+// Create battle zones from battle zones map
 const battleZones = [];
-
 battleZonesMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
         if (symbol === 1025) {
@@ -53,7 +67,9 @@ battleZonesMap.forEach((row, i) => {
     });
 });
 
-// Load images
+// ============================================
+// IMAGE LOADING
+// ============================================
 const mapImage = new Image();
 mapImage.src = './img/Town.png';
 
@@ -72,7 +88,9 @@ playerRightImage.src = './img/playerRight.png';
 const playerLeftImage = new Image();
 playerLeftImage.src = './img/playerLeft.png';
 
-// Create sprites
+// ============================================
+// SPRITE CREATION
+// ============================================
 const background = new Sprite({
     position: {
         x: offset.x,
@@ -106,7 +124,9 @@ const player = new Sprite({
     }
 });
 
-// Input handling
+// ============================================
+// INPUT HANDLING
+// ============================================
 const keys = {
     w: { pressed: false },
     a: { pressed: false },
@@ -117,7 +137,9 @@ const keys = {
 let keyPressOrder = [];
 const moveables = [background, ...boundaries, foreground, ...battleZones];
 
-// Collision detection function
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
 function rectangularCollision({ rectangle1, rectangle2 }) {
     return (
         rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
@@ -127,7 +149,6 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
     );
 }
 
-// Check if movement would cause collision
 function wouldCollide(dx, dy) {
     for (let i = 0; i < boundaries.length; i++) {
         const boundary = boundaries[i];
@@ -147,7 +168,6 @@ function wouldCollide(dx, dy) {
     return false;
 }
 
-// Move all moveable objects
 function moveObjects(dx, dy) {
     moveables.forEach(moveable => {
         moveable.position.x += dx;
@@ -155,86 +175,140 @@ function moveObjects(dx, dy) {
     });
 }
 
-// Main game loop
-function animate() {
-    window.requestAnimationFrame(animate);
+// ============================================
+// BATTLE ZONE DETECTION
+// ============================================
+function checkBattleZoneCollision() {
+    const battle = {
+    initiated: false,
+}
+    
+    player.moving = false;
 
-// Clear and draw
-background.draw();
-boundaries.forEach(boundary => boundary.draw());
-battleZones.forEach(battleZones => battleZones.draw());
-player.draw();
-foreground.draw();
+    if (battleZones.initiated) return; // Already in battle
 
-if (keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
+    if (!(keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed)) {
+        return;
+    }
+
     for (let i = 0; i < battleZones.length; i++) {
         const battleZone = battleZones[i];
-        const overlappingArea = (Math.min(player.position.x + player.width, battleZone.position.x + battleZone.width) 
-        - Math.max(player.position.x, battleZone.position.x))
-        * (Math.min(player.position.y +player.height, battleZone.position.y + battleZone.height)
-        - Math.max(player.position.y, battleZone.position.y));
+        
+        if (!rectangularCollision({ rectangle1: player, rectangle2: battleZone })) {
+            continue;
+        }
+
+        // Calculate overlapping area
+        const overlappingArea = 
+            (Math.min(player.position.x + player.width, battleZone.position.x + battleZone.width) 
+             - Math.max(player.position.x, battleZone.position.x)) *
+            (Math.min(player.position.y + player.height, battleZone.position.y + battleZone.height)
+             - Math.max(player.position.y, battleZone.position.y));
              
-        if (
-            rectangularCollision({
-                rectangle1: player,
-                rectangle2: battleZone
-            }) &&
-            overlappingArea > player.width * player.height / 2
-            && Math.random() < .01 // 1% chance to trigger battle
-        ){
-            console.log('Battle Zone Entered');
+        // Check if player is mostly in battle zone and random chance triggers
+        if (overlappingArea > player.width * player.height / 2 && Math.random() < 0.01) {
+            window.cancelAnimationFrame(animationId);
+            battleZone.initiated = true;
+            gsap.to('#overlappingDiv', {
+                opacity: 1,
+                repeat: 3,
+                yoyo: true,
+                duration: 0.4,
+                onComplete() {
+                    gsap.to('#overlappingDiv', {
+                        opacity: 1,
+                        duration: 0.4,
+                        onComplete: () => {
+                            animateBattle();
+                            gsap.to('#overlappingDiv', {
+                                opacity: 0,
+                                duration: 0.4,
+                            });
+                        }
+                    })
+
+                    
+                }
+            })
             break;
-}}
+        }
+    }
 }
 
-// Handle movement
-const lastKey = keyPressOrder[keyPressOrder.length - 1];
 
-player.moving = false;
-if (keys.w.pressed && lastKey === 'w') {
+
+// ============================================
+// PLAYER MOVEMENT HANDLING
+// ============================================
+function handlePlayerMovement() {
+    const lastKey = keyPressOrder[keyPressOrder.length - 1];
+    player.moving = false;
+
+    if (keys.w.pressed && lastKey === 'w') {
+        movePlayer('up', player.sprites.up, 0, PLAYER_SPEED);
+    } else if (keys.a.pressed && lastKey === 'a') {
+        movePlayer('left', player.sprites.left, PLAYER_SPEED, 0);
+    } else if (keys.s.pressed && lastKey === 's') {
+        movePlayer('down', player.sprites.down, 0, -PLAYER_SPEED);
+    } else if (keys.d.pressed && lastKey === 'd') {
+        movePlayer('right', player.sprites.right, -PLAYER_SPEED, 0);
+    }
+}
+
+function movePlayer(direction, sprite, dx, dy) {
     player.moving = true;
-    player.image = player.sprites.up;
-    if (player.image !== player.sprites.up) {
-        player.image = player.sprites.up;
-        player.frames.val = 0;
-    }
-    if (!wouldCollide(0, PLAYER_SPEED)) {
-        moveObjects(0, PLAYER_SPEED);
-    }
-} else if (keys.a.pressed && lastKey === 'a') {
-    player.moving = true;
-    player.image = player.sprites.left;
-    if (player.image !== player.sprites.left) {
-        player.image = player.sprites.left;
-        player.frames.val = 0; 
-    }
-    if (!wouldCollide(PLAYER_SPEED, 0)) {
-        moveObjects(PLAYER_SPEED, 0);
-    }
-} else if (keys.s.pressed && lastKey === 's') {
-    player.moving = true;
-    player.image = player.sprites.down;
-    if (player.image !== player.sprites.down) {
-        player.image = player.sprites.down;
+    
+    // Change sprite if needed
+    if (player.image !== sprite) {
+        player.image = sprite;
         player.frames.val = 0; // Reset animation frame
     }
-    if (!wouldCollide(0, -PLAYER_SPEED)) {
-        moveObjects(0, -PLAYER_SPEED);
+    
+    // Move if no collision
+    if (!wouldCollide(dx, dy)) {
+        moveObjects(dx, dy);
     }
-} else if (keys.d.pressed && lastKey === 'd') {
-    player.moving = true;
-    player.image = player.sprites.right;
-    if (player.image !== player.sprites.right) {
-        player.image = player.sprites.right;
-        player.frames.val = 0; // Reset animation frame
-    }
-    if (!wouldCollide(-PLAYER_SPEED, 0)) {
-        moveObjects(-PLAYER_SPEED, 0);
-    }
-}
 }
 
-// Event listeners
+// ============================================
+// GAME RENDERING
+// ============================================
+function render() {
+    // Draw in correct layer order
+    background.draw();
+    boundaries.forEach(boundary => boundary.draw());
+    battleZones.forEach(battleZone => battleZone.draw());
+    player.draw();
+    foreground.draw();
+}
+
+// ============================================
+// MAIN GAME LOOP
+// ============================================
+function animate() {
+    const animationId = window.requestAnimationFrame(animate);
+
+    render();
+    checkBattleZoneCollision();
+    handlePlayerMovement();
+}
+
+const battleBackgroundImage = new Image();
+battleBackgroundImage.src = './img/battleBackground.png';
+
+const battleBackground = new Sprite({
+    position: { x: 0, y: 0 },
+    image: battleBackgroundImage
+
+});
+function animateBattle() {
+    window.requestAnimationFrame(animateBattle);
+    battleBackground.draw();
+}
+
+// ============================================
+// EVENT LISTENERS
+// ============================================
 window.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
 
@@ -254,5 +328,7 @@ window.addEventListener('keyup', (e) => {
     }
 });
 
-// Start the game
+// ============================================
+// GAME START
+// ============================================
 animate();
