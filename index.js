@@ -40,17 +40,17 @@ mapImage.src = './img/Town.png';
 const foregroundImage = new Image();
 foregroundImage.src = './img/foregroundObjects.png';
 
-const playerImage = new Image();
-playerImage.src = './img/playerDown.png';
+const playerDownImage = new Image();
+playerDownImage.src = './img/playerDown.png';
 
 const playerUpImage = new Image();
-playerImage.src = './img/playerUp.png';
+playerUpImage.src = './img/playerUp.png';
 
 const playerRightImage = new Image();
-playerImage.src = './img/playerRight.png';
+playerRightImage.src = './img/playerRight.png';
 
 const playerLeftImage = new Image();
-playerImage.src = './img/playerLeft.png';
+playerLeftImage.src = './img/playerLeft.png';
 
 // Create sprites
 const background = new Sprite({
@@ -74,14 +74,14 @@ const player = new Sprite({
         x: canvas.width / 2 - 192 / 4 / 2,
         y: canvas.height / 2 - 68 / 2
     },
-    image: playerImage,
+    image: playerDownImage,
     frames: {
         max: 4
     },
     sprites: {
         up: playerUpImage,  
         right: playerRightImage,
-        down: playerImage,
+        down: playerDownImage,
         left: playerLeftImage
     }
 });
@@ -139,41 +139,58 @@ function moveObjects(dx, dy) {
 function animate() {
     window.requestAnimationFrame(animate);
 
-    // Clear and draw
-    background.draw();
-    boundaries.forEach(boundary => boundary.draw());
-    player.draw();
-    foreground.draw();
+// Clear and draw
+background.draw();
+boundaries.forEach(boundary => boundary.draw());
+player.draw();
+foreground.draw();
 
-    // Handle movement
-    const lastKey = keyPressOrder[keyPressOrder.length - 1];
+// Handle movement
+const lastKey = keyPressOrder[keyPressOrder.length - 1];
 
-    player.moving = false;
-    if (keys.w.pressed && lastKey === 'w') {
-        player.moving = true;
+player.moving = false;
+if (keys.w.pressed && lastKey === 'w') {
+    player.moving = true;
+    player.image = player.sprites.up;
+    if (player.image !== player.sprites.up) {
         player.image = player.sprites.up;
-        if (!wouldCollide(0, PLAYER_SPEED)) {
-            moveObjects(0, PLAYER_SPEED);
-        }
-    } else if (keys.a.pressed && lastKey === 'a') {
-        player.moving = true;
-        player.image = player.sprites.left;
-        if (!wouldCollide(PLAYER_SPEED, 0)) {
-            moveObjects(PLAYER_SPEED, 0);
-        }
-    } else if (keys.s.pressed && lastKey === 's') {
-        player.moving = true;
-        player.image = player.sprites.down;
-        if (!wouldCollide(0, -PLAYER_SPEED)) {
-            moveObjects(0, -PLAYER_SPEED);
-        }
-    } else if (keys.d.pressed && lastKey === 'd') {
-        player.moving = true;
-        player.image = player.sprites.right;
-        if (!wouldCollide(-PLAYER_SPEED, 0)) {
-            moveObjects(-PLAYER_SPEED, 0);
-        }
+        player.frames.val = 0;
     }
+    if (!wouldCollide(0, PLAYER_SPEED)) {
+        moveObjects(0, PLAYER_SPEED);
+    }
+} else if (keys.a.pressed && lastKey === 'a') {
+    player.moving = true;
+    player.image = player.sprites.left;
+    if (player.image !== player.sprites.left) {
+        player.image = player.sprites.left;
+        player.frames.val = 0; 
+    }
+    if (!wouldCollide(PLAYER_SPEED, 0)) {
+        moveObjects(PLAYER_SPEED, 0);
+    }
+} else if (keys.s.pressed && lastKey === 's') {
+    player.moving = true;
+    player.image = player.sprites.down;
+    if (player.image !== player.sprites.down) {
+        player.image = player.sprites.down;
+        player.frames.val = 0; // Reset animation frame
+    }
+    if (!wouldCollide(0, -PLAYER_SPEED)) {
+        moveObjects(0, -PLAYER_SPEED);
+    }
+} else if (keys.d.pressed && lastKey === 'd') {
+    player.moving = true;
+    player.image = player.sprites.right;
+    if (player.image !== player.sprites.right) {
+        player.image = player.sprites.right;
+        player.frames.val = 0; // Reset animation frame
+    }
+    if (!wouldCollide(-PLAYER_SPEED, 0)) {
+        moveObjects(-PLAYER_SPEED, 0);
+    }
+}
+player.moving = moving;
 }
 
 // Event listeners
