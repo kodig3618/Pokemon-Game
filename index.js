@@ -12,6 +12,11 @@ for (let i = 0; i < collisions.length; i += MAP_COLS) {
     collisionsMap.push(collisions.slice(i, i + MAP_COLS));
 }
 
+const battleZonesMap = [];
+for (let i = 0; i < battleZonesData.length; i += MAP_COLS) {
+    battleZonesMap.push(battleZonesData.slice(i, i + MAP_COLS));
+}
+
 // Game objects
 const offset = {
     x: -305,
@@ -24,6 +29,21 @@ collisionsMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
         if (symbol === 1025) {
             boundaries.push(new Boundary({
+                position: {
+                    x: j * Boundary.width + offset.x,
+                    y: i * Boundary.height + offset.y
+                }
+            }));
+        }
+    });
+});
+
+const battleZones = [];
+
+battleZonesMap.forEach((row, i) => {
+    row.forEach((symbol, j) => {
+        if (symbol === 1025) {
+            battleZones.push(new Boundary({
                 position: {
                     x: j * Boundary.width + offset.x,
                     y: i * Boundary.height + offset.y
@@ -142,6 +162,7 @@ function animate() {
 // Clear and draw
 background.draw();
 boundaries.forEach(boundary => boundary.draw());
+battleZones.forEach(battleZones => battleZones.draw());
 player.draw();
 foreground.draw();
 
