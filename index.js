@@ -4,13 +4,6 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-gsap.to('#overlappingDiv', {
-    opacity: 1,
-    repeat: 3,
-    yoyo: true,
-    duration: 0.4,
-})
-
 canvas.width = 1024;
 canvas.height = 576;
 
@@ -88,6 +81,12 @@ playerRightImage.src = './img/playerRight.png';
 const playerLeftImage = new Image();
 playerLeftImage.src = './img/playerLeft.png';
 
+const battleBackgroundImage = new Image();
+battleBackgroundImage.src = './img/battleBackground.png';
+
+const mushroomImage = new Image();
+mushroomImage.src = './img/mushroomSprite.png';
+
 // ============================================
 // SPRITE CREATION
 // ============================================
@@ -100,7 +99,7 @@ const background = new Sprite({
 });
 
 const foreground = new Sprite({
-    position: { 
+    position: {
         x: offset.x,
         y: offset.y
     },
@@ -117,12 +116,29 @@ const player = new Sprite({
         max: 4
     },
     sprites: {
-        up: playerUpImage,  
+        up: playerUpImage,
         right: playerRightImage,
         down: playerDownImage,
         left: playerLeftImage
     }
 });
+
+const battleBackground = new Sprite({
+    position: { x: 0, y: 0 },
+    image: battleBackgroundImage
+});
+
+const mushroom = new Sprite({
+    position: {
+        x: 800,
+        y: 90
+    },
+    image: mushroomImage,
+    frames: {
+        max: 4
+    },
+    animate: true,
+})
 
 // ============================================
 // INPUT HANDLING
@@ -136,6 +152,7 @@ const keys = {
 
 let keyPressOrder = [];
 const moveables = [background, ...boundaries, foreground, ...battleZones];
+let animationId = null;
 
 // ============================================
 // UTILITY FUNCTIONS
@@ -179,14 +196,9 @@ function moveObjects(dx, dy) {
 // BATTLE ZONE DETECTION
 // ============================================
 function checkBattleZoneCollision() {
-    const battle = {
-    initiated: false,
-}
-    
     player.moving = false;
 
-    if (battleZones.initiated) return; // Already in battle
-
+    // Check if any movement keys are pressed
     if (!(keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed)) {
         return;
     }
@@ -194,7 +206,8 @@ function checkBattleZoneCollision() {
     for (let i = 0; i < battleZones.length; i++) {
         const battleZone = battleZones[i];
         
-        if (!rectangularCollision({ rectangle1: player, rectangle2: battleZone })) {
+        // Skip if already initiated or no collision
+        if (battleZone.initiated || !rectangularCollision({ rectangle1: player, rectangle2: battleZone })) {
             continue;
         }
 
@@ -207,56 +220,70 @@ function checkBattleZoneCollision() {
              
         // Check if player is mostly in battle zone and random chance triggers
         if (overlappingArea > player.width * player.height / 2 && Math.random() < 0.01) {
-            window.cancelAnimationFrame(animationId);
-            battleZone.initiated = true;
-            gsap.to('#overlappingDiv', {
-                opacity: 1,
-                repeat: 3,
-                yoyo: true,
-                duration: 0.4,
-                onComplete() {
-                    gsap.to('#overlappingDiv', {
-                        opacity: 1,
-                        duration: 0.4,
-                        onComplete: () => {
-                            animateBattle();
-                            gsap.to('#overlappingDiv', {
-                                opacity: 0,
-                                duration: 0.4,
-                            });
-                        }
-                    })
-
-                    
-                }
-            })
+            initiateBattle(battleZone);
             break;
         }
     }
 }
 
+function initiateBattle(battleZone) {
+    window.cancelAnimationFrame(animationId);
+    battleZone.initiated = true;
 
+    gsap.to('#overlappingDiv', {
+        opacity: 1,
+        repeat: 3,
+        yoyo: true,
+        duration: 0.4,
+        onComplete() {
+            gsap.to('#overlappingDiv', {
+                opacity: 1,
+                duration: 0.4,
+                onComplete: () => {
+                    animateBattle();
+                    gsap.to('#overlappingDiv', {
+                        opacity: 0,
+                        duration: 0.4,
+                    });
+                }
+            });
+        }
+    });
+}
 
 // ============================================
 // PLAYER MOVEMENT HANDLING
 // ============================================
 function handlePlayerMovement() {
     const lastKey = keyPressOrder[keyPressOrder.length - 1];
-    player.moving = false;
+    player.animate = false;
 
-    if (keys.w.pressed && lastKey === 'w') {
-        movePlayer('up', player.sprites.up, 0, PLAYER_SPEED);
-    } else if (keys.a.pressed && lastKey === 'a') {
-        movePlayer('left', player.sprites.left, PLAYER_SPEED, 0);
-    } else if (keys.s.pressed && lastKey === 's') {
-        movePlayer('down', player.sprites.down, 0, -PLAYER_SPEED);
-    } else if (keys.d.pressed && lastKey === 'd') {
-        movePlayer('right', player.sprites.right, -PLAYER_SPEED, 0);
+    switch (lastKey) {
+        case 'w':
+            if (keys.w.pressed) {
+                movePlayer('up', player.sprites.up, 0, PLAYER_SPEED);
+            }
+            break;
+        case 'a':
+            if (keys.a.pressed) {
+                movePlayer('left', player.sprites.left, PLAYER_SPEED, 0);
+            }
+            break;
+        case 's':
+            if (keys.s.pressed) {
+                movePlayer('down', player.sprites.down, 0, -PLAYER_SPEED);
+            }
+            break;
+        case 'd':
+            if (keys.d.pressed) {
+                movePlayer('right', player.sprites.right, -PLAYER_SPEED, 0);
+            }
+            break;
     }
 }
 
 function movePlayer(direction, sprite, dx, dy) {
-    player.moving = true;
+    player.animate = true;
     
     // Change sprite if needed
     if (player.image !== sprite) {
@@ -283,27 +310,19 @@ function render() {
 }
 
 // ============================================
-// MAIN GAME LOOP
+// GAME LOOPS
 // ============================================
 function animate() {
-    const animationId = window.requestAnimationFrame(animate);
-
+    animationId = window.requestAnimationFrame(animate);
     render();
     checkBattleZoneCollision();
     handlePlayerMovement();
 }
 
-const battleBackgroundImage = new Image();
-battleBackgroundImage.src = './img/battleBackground.png';
-
-const battleBackground = new Sprite({
-    position: { x: 0, y: 0 },
-    image: battleBackgroundImage
-
-});
 function animateBattle() {
     window.requestAnimationFrame(animateBattle);
     battleBackground.draw();
+    mushroom.draw();
 }
 
 // ============================================
@@ -331,4 +350,4 @@ window.addEventListener('keyup', (e) => {
 // ============================================
 // GAME START
 // ============================================
-animate();
+animateBattle();
