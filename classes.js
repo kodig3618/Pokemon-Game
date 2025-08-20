@@ -17,6 +17,7 @@ class Sprite {
         this.animate = animate; // Add animate property
         this.animationSpeed = animationSpeed; // Add customizable animation speed
         this.sprites = sprites;
+        this.opacity = 1;
 
         // Calculate sprite dimensions once image loads
         this.image.onload = () => {
@@ -29,6 +30,9 @@ class Sprite {
         if (!this.image.complete) return;
 
         // Draw the current frame of the sprite
+        ctx.save();
+        ctx.globalAlpha = this.opacity; // Apply opacity
+
         ctx.drawImage(
             this.image,
             this.frames.val * this.width,
@@ -40,6 +44,8 @@ class Sprite {
             this.image.width / this.frames.max,
             this.image.height
         );
+
+        ctx.restore();
 
         // Handle animation frames
         this._updateAnimationFrame();
@@ -66,15 +72,29 @@ class Sprite {
 
         tl.to(this.position, {
             x: this.position.x - 20,
-        }).to(this.position.x, {
+        }).to(this.position, {
             x: this.position.x + 40,
             duration: 0.1,
             onComplete: () => {
+                gsap.to('#enemyHealthGreen', {
+                    width: attack.damage + '%',
+                })
+
                 gsap.to(recipient.position, {
                     x: recipient.position.x + 10,
+                    yoyo: true,
+                    repeat: 5,
+                    duration: 0.08,
+                })
+
+                gsap.to(recipient, {
+                    opacity: 0,
+                    repeat: 5,
+                    yoyo: true,
+                    duration: 0.08,
                 })
             }
-        }).to(this.position.x, {
+        }).to(this.position, {
             x: this.position.x,
         })
     }
