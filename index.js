@@ -145,7 +145,7 @@ const mushy = new Sprite({
     isEmemy: true
 });
 
-const ember = new Sprite({
+const emby = new Sprite({
     position: {
         x: 255,
         y: 270
@@ -277,7 +277,9 @@ function initiateBattle(battleZone) {
 // ============================================
 document.querySelectorAll('button').forEach(button => {
     button.addEventListener('click', () => {
-        ember.attack({
+        const selectedAttack = attacks[e.currentTarget.innerHTML]
+        emby.attack({
+            attack: selectedAttack,
             recipient: mushy
         });
     });
@@ -355,7 +357,7 @@ function animateBattle() {
     window.requestAnimationFrame(animateBattle);
     battleBackground.draw();
     mushy.draw();
-    ember.draw();
+    emby.draw();
 }
 
 // ============================================
