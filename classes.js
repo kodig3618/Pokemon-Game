@@ -9,7 +9,7 @@ const MAP_COLS = 70;
 // SPRITE CLASS
 // ============================================
 class Sprite {
-    constructor({ position, image, frames = { max: 1 }, sprites, animate = false, animationSpeed = 10 }) {
+    constructor({ position, image, frames = { max: 1 }, sprites, animate = false, animationSpeed = 10, isEmemy}) {
         this.position = position;
         this.image = image;
         this.frames = { ...frames, val: 0, elapsed: 0 };
@@ -18,6 +18,8 @@ class Sprite {
         this.animationSpeed = animationSpeed; // Add customizable animation speed
         this.sprites = sprites;
         this.opacity = 1;
+        this.health = 100, // Default health
+        this.isEmemy = isEmemy;
 
         // Calculate sprite dimensions once image loads
         this.image.onload = () => {
@@ -42,7 +44,7 @@ class Sprite {
             this.position.x,
             this.position.y,
             this.image.width / this.frames.max,
-            this.image.height
+            this.image.height,
         );
 
         ctx.restore();
@@ -67,17 +69,26 @@ class Sprite {
         }
     }
 
-    attack({attackType, recipient}) {
+    attack({attack, recipient}) {
         const tl = gsap.timeline();
 
+        let movementDistance = 20;
+        if (this.isEmemy) movementDistance = -20;
+
+        let healthBar = '#enemyHealthGreen';
+        if (!this.isEmemy) healthBar = '#playerHealthGreen';
+        
+
         tl.to(this.position, {
-            x: this.position.x - 20,
+            x: this.position.x - movementDistance,
+            duration: 0.1
         }).to(this.position, {
-            x: this.position.x + 40,
+            x: this.position.x + movementDistance * 2,
             duration: 0.1,
             onComplete: () => {
-                gsap.to('#enemyHealthGreen', {
-                    width: attack.damage + '%',
+                gsap.to(healthBar, {
+                    width: (this.health - attack.damage) + '%', // Reduce health bar
+                    duration: 0.2
                 })
 
                 gsap.to(recipient.position, {
@@ -96,6 +107,7 @@ class Sprite {
             }
         }).to(this.position, {
             x: this.position.x,
+            duration: 0.1
         })
     }
 }

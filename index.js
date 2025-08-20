@@ -141,7 +141,8 @@ const mushy = new Sprite({
         max: 4
     },
     animate: true,
-    animationSpeed: 25 // Slower animation (higher number = slower)
+    animationSpeed: 25, // Slower animation (higher number = slower)
+    isEmemy: true,
 })
 
 const ember = new Sprite({
@@ -271,7 +272,7 @@ function initiateBattle(battleZone) {
 document.querySelectorAll('button').forEach(button => {
     button.addEventListener('click', () => {
         ember.attack({
-            attackType: {
+            attack: {
                 name: 'Tackle',
                 damage: 10,
                 type: 'Normal'
