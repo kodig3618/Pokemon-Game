@@ -87,6 +87,9 @@ battleBackgroundImage.src = './img/battleBackground.png';
 const mushroomImage = new Image();
 mushroomImage.src = './img/mushroomSprite.png';
 
+const flameImage = new Image();
+flameImage.src = './img/flameSprite.png';
+
 // ============================================
 // SPRITE CREATION
 // ============================================
@@ -120,7 +123,7 @@ const player = new Sprite({
         right: playerRightImage,
         down: playerDownImage,
         left: playerLeftImage
-    }
+    },
 });
 
 const battleBackground = new Sprite({
@@ -128,16 +131,30 @@ const battleBackground = new Sprite({
     image: battleBackgroundImage
 });
 
-const mushroom = new Sprite({
+const mushy = new Sprite({
     position: {
-        x: 800,
-        y: 90
+        x: 770,
+        y: 40
     },
     image: mushroomImage,
     frames: {
         max: 4
     },
     animate: true,
+    animationSpeed: 25 // Slower animation (higher number = slower)
+})
+
+const ember = new Sprite({
+    position: {
+        x: 255,
+        y: 270
+    },
+    image: flameImage,
+    frames: {
+        max: 4
+    },
+    animate: true,
+    animationSpeed: 25 // Slower animation (higher number = slower)
 })
 
 // ============================================
@@ -251,6 +268,20 @@ function initiateBattle(battleZone) {
     });
 }
 
+document.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', () => {
+        ember.attack({
+            attackType: {
+                name: 'Tackle',
+                damage: 10,
+                type: 'Normal'
+            },
+            recipient: mushy,
+            
+        })
+    })
+})
+
 // ============================================
 // PLAYER MOVEMENT HANDLING
 // ============================================
@@ -322,7 +353,8 @@ function animate() {
 function animateBattle() {
     window.requestAnimationFrame(animateBattle);
     battleBackground.draw();
-    mushroom.draw();
+    mushy.draw();
+    ember.draw();
 }
 
 // ============================================

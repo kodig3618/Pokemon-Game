@@ -3,39 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <title>Pokemon Game</title>
-    <style>
-        body {
-            background-color: black;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        
-        canvas {
-            border: 2px solid white;
-            background-color: #4a90e2;
-        }
-
-        #overlappingDiv {
-            background-color: black;
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            opacity: 0;
-            pointer-events: none;
-        }
-    </style>
 </head>
 <body>
     <div style="display: inline-block; position: relative;">
-        <canvas id="gameCanvas"></canvas>
         <div id="overlappingDiv"></div>
+        <div id="enemyHealth">
+            <h1>Mushy</h1>
+            <div style="position: relative;">
+            <div id="enemyHealthBlank"></div>
+            <div id="enemyHealthGreen"></div>
+            </div>
+        </div>
+
+        <div id="playerHealth">
+            <h1>Ember</h1>
+            <div style="position: relative;">
+            <div id="healthBlank"></div>
+            <div id="healthGreen"></div>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div id = "attackBar">
+            <div id="attackButtons">
+                <button id="attackButton">Tackle</button>
+                <button id="attackButton">Attack2</button>
+            </div>
+            <div id ="attackType">
+                <h1>Attack Type</h1>
+            </div>
+        </div>
     </div>
 
     <!-- External Libraries -->

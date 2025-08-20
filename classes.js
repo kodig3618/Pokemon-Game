@@ -2,18 +2,20 @@
 // GAME CONSTANTS
 // ============================================
 const TILE_SIZE = 48;
-const PLAYER_SPEED = 3;
+const PLAYER_SPEED = 4;
 const MAP_COLS = 70;
 
 // ============================================
 // SPRITE CLASS
 // ============================================
 class Sprite {
-    constructor({ position, image, frames = { max: 1 }, sprites }) {
+    constructor({ position, image, frames = { max: 1 }, sprites, animate = false, animationSpeed = 10 }) {
         this.position = position;
         this.image = image;
         this.frames = { ...frames, val: 0, elapsed: 0 };
         this.moving = false;
+        this.animate = animate; // Add animate property
+        this.animationSpeed = animationSpeed; // Add customizable animation speed
         this.sprites = sprites;
 
         // Calculate sprite dimensions once image loads
@@ -44,18 +46,37 @@ class Sprite {
     }
 
     _updateAnimationFrame() {
-        if (!this.moving || this.frames.max <= 1) return;
+        // Animate if either moving OR animate is true
+        if ((!this.moving && !this.animate) || this.frames.max <= 1) return;
 
         this.frames.elapsed++;
 
-        // Update frame every 10 game loops
-        if (this.frames.elapsed % 10 === 0) {
+        // Update frame based on animationSpeed
+        if (this.frames.elapsed % this.animationSpeed === 0) {
             if (this.frames.val < this.frames.max - 1) {
                 this.frames.val++;
             } else {
                 this.frames.val = 0;
             }
         }
+    }
+
+    attack({attackType, recipient}) {
+        const tl = gsap.timeline();
+
+        tl.to(this.position, {
+            x: this.position.x - 20,
+        }).to(this.position.x, {
+            x: this.position.x + 40,
+            duration: 0.1,
+            onComplete: () => {
+                gsap.to(recipient.position, {
+                    x: recipient.position.x + 10,
+                })
+            }
+        }).to(this.position.x, {
+            x: this.position.x,
+        })
     }
 }
 
