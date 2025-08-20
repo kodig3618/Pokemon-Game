@@ -75,9 +75,12 @@ class Sprite {
         let movementDistance = 20;
         if (this.isEmemy) movementDistance = -20;
 
-        let healthBar = '#enemyHealthGreen';
-        if (!this.isEmemy) healthBar = '#playerHealthGreen';
-        
+        let healthBar = recipient.isEmemy ? '#enemyHealthGreen' : '#healthGreen';
+
+        // Reduce the recipient's health
+        recipient.health -= attack.damage;
+        // Make sure health doesn't go below 0
+        if (recipient.health < 0) recipient.health = 0;
 
         tl.to(this.position, {
             x: this.position.x - movementDistance,
@@ -87,7 +90,7 @@ class Sprite {
             duration: 0.1,
             onComplete: () => {
                 gsap.to(healthBar, {
-                    width: (this.health - attack.damage) + '%', // Reduce health bar
+                    width: recipient.health + '%', 
                     duration: 0.2
                 })
 

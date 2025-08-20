@@ -106,7 +106,7 @@ const foreground = new Sprite({
         x: offset.x,
         y: offset.y
     },
-    image: foregroundImage,
+    image: foregroundImage
 });
 
 const player = new Sprite({
@@ -123,7 +123,7 @@ const player = new Sprite({
         right: playerRightImage,
         down: playerDownImage,
         left: playerLeftImage
-    },
+    }
 });
 
 const battleBackground = new Sprite({
@@ -141,9 +141,9 @@ const mushy = new Sprite({
         max: 4
     },
     animate: true,
-    animationSpeed: 25, // Slower animation (higher number = slower)
-    isEmemy: true,
-})
+    animationSpeed: 25,
+    isEmemy: true
+});
 
 const ember = new Sprite({
     position: {
@@ -155,8 +155,8 @@ const ember = new Sprite({
         max: 4
     },
     animate: true,
-    animationSpeed: 25 // Slower animation (higher number = slower)
-})
+    animationSpeed: 25
+});
 
 // ============================================
 // INPUT HANDLING
@@ -211,7 +211,7 @@ function moveObjects(dx, dy) {
 }
 
 // ============================================
-// BATTLE ZONE DETECTION
+// BATTLE SYSTEM
 // ============================================
 function checkBattleZoneCollision() {
     player.moving = false;
@@ -225,7 +225,10 @@ function checkBattleZoneCollision() {
         const battleZone = battleZones[i];
         
         // Skip if already initiated or no collision
-        if (battleZone.initiated || !rectangularCollision({ rectangle1: player, rectangle2: battleZone })) {
+        if (battleZone.initiated || !rectangularCollision({ 
+            rectangle1: player, 
+            rectangle2: battleZone 
+        })) {
             continue;
         }
 
@@ -261,7 +264,7 @@ function initiateBattle(battleZone) {
                     animateBattle();
                     gsap.to('#overlappingDiv', {
                         opacity: 0,
-                        duration: 0.4,
+                        duration: 0.4
                     });
                 }
             });
@@ -269,19 +272,16 @@ function initiateBattle(battleZone) {
     });
 }
 
+// ============================================
+// ATTACK SYSTEM
+// ============================================
 document.querySelectorAll('button').forEach(button => {
     button.addEventListener('click', () => {
         ember.attack({
-            attack: {
-                name: 'Tackle',
-                damage: 10,
-                type: 'Normal'
-            },
-            recipient: mushy,
-            
-        })
-    })
-})
+            recipient: mushy
+        });
+    });
+});
 
 // ============================================
 // PLAYER MOVEMENT HANDLING

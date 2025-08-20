@@ -1,3 +1,6 @@
+/* ============================================ */
+/* GLOBAL STYLES */
+/* ============================================ */
 * {
     font-family: "Press Start 2P", cursive;
 }
@@ -11,11 +14,25 @@ body {
     min-height: 100vh;
 }
 
+/* ============================================ */
+/* GAME CONTAINER */
+/* ============================================ */
+.game-container {
+    display: inline-block;
+    position: relative;
+}
+
+/* ============================================ */
+/* CANVAS STYLES */
+/* ============================================ */
 canvas {
     border: 2px solid white;
     background-color: #4a90e2;
 }
 
+/* ============================================ */
+/* UI ELEMENTS */
+/* ============================================ */
 h1 {
     margin: 0; 
     font-size: 16px; 
@@ -31,6 +48,19 @@ button:hover {
     background-color: #ccc;
 }
 
+.attack-button {
+    border: none;
+    font-size: 16px;
+}
+
+.attack-button:hover {
+    cursor: pointer;
+    background-color: #ccc;
+}
+
+/* ============================================ */
+/* OVERLAY */
+/* ============================================ */
 #overlappingDiv {
     background-color: black;
     position: absolute;
@@ -42,6 +72,9 @@ button:hover {
     pointer-events: none;
 }
 
+/* ============================================ */
+/* ATTACK BAR */
+/* ============================================ */
 #attackBar {
     background-color: white;
     position: absolute;
@@ -54,7 +87,7 @@ button:hover {
 }
 
 #attackButtons {
-    width:  66.66%;
+    width: 66.66%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
 }
@@ -67,6 +100,15 @@ button:hover {
     border-left: 4px solid black;
 }
 
+/* ============================================ */
+/* HEALTH BARS */
+/* ============================================ */
+.health-bar-container {
+    position: relative;
+    margin-top: 10px;
+}
+
+/* Enemy Health Bar */
 #enemyHealth {
     background-color: white;
     width: 250px;
@@ -81,7 +123,6 @@ button:hover {
 #enemyHealthBlank {
     height: 5px;
     background-color: #ccc;
-    margin-top: 10px;
 }
 
 #enemyHealthGreen {
@@ -93,6 +134,7 @@ button:hover {
     right: 0;
 }
 
+/* Player Health Bar */
 #playerHealth {
     background-color: white;
     width: 250px;
@@ -107,7 +149,6 @@ button:hover {
 #healthBlank {
     height: 5px;
     background-color: #ccc;
-    margin-top: 10px;
 }
 
 #healthGreen {

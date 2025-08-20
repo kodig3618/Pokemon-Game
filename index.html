@@ -3,39 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Game</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
-    <title>Pokemon Game</title>
 </head>
 <body>
-    <div style="display: inline-block; position: relative;">
+    <div class="game-container">
+        <!-- Transition overlay -->
         <div id="overlappingDiv"></div>
+        
+        <!-- Enemy health bar -->
         <div id="enemyHealth">
             <h1>Mushy</h1>
-            <div style="position: relative;">
-            <div id="enemyHealthBlank"></div>
-            <div id="enemyHealthGreen"></div>
+            <div class="health-bar-container">
+                <div id="enemyHealthBlank"></div>
+                <div id="enemyHealthGreen"></div>
             </div>
         </div>
 
+        <!-- Player health bar -->
         <div id="playerHealth">
             <h1>Ember</h1>
-            <div style="position: relative;">
-            <div id="healthBlank"></div>
-            <div id="healthGreen"></div>
+            <div class="health-bar-container">
+                <div id="healthBlank"></div>
+                <div id="healthGreen"></div>
             </div>
         </div>
 
+        <!-- Game canvas -->
         <canvas id="gameCanvas"></canvas>
 
-        <div id = "attackBar">
+        <!-- Attack interface -->
+        <div id="attackBar">
             <div id="attackButtons">
-                <button id="attackButton">Tackle</button>
-                <button id="attackButton">Attack2</button>
+                <button class="attack-button">Tackle</button>
+                <button class="attack-button">Fireball</button>
             </div>
-            <div id ="attackType">
+            <div id="attackType">
                 <h1>Attack Type</h1>
             </div>
         </div>
@@ -52,6 +62,7 @@
     <script src="classes.js"></script>
     <script src="data/collisions.js"></script>
     <script src="data/battleZones.js"></script>
+    <script src="data/attacks.js"></script>
     <script src="index.js"></script>
 </body>
 </html>
