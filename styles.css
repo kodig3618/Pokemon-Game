@@ -72,6 +72,17 @@ button:hover {
     pointer-events: none;
 }
 
+#dialogueBox {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: white;
+    padding: 12px;
+    display: none; /* Hidden by default */
+}
+
 /* ============================================ */
 /* ATTACK BAR */
 /* ============================================ */

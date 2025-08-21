@@ -16,7 +16,9 @@ class Sprite {
         sprites, 
         animate = false, 
         animationSpeed = 10, 
-        isEmemy = false 
+        isEmemy = false, 
+        rotation = 0,
+        name
     }) {
         this.position = position;
         this.image = image;
@@ -28,6 +30,8 @@ class Sprite {
         this.opacity = 1;
         this.health = 100;
         this.isEmemy = isEmemy;
+        this.rotation = rotation
+        this.name = name
 
         // Calculate sprite dimensions once image loads
         this.image.onload = () => {
@@ -41,6 +45,9 @@ class Sprite {
 
         // Draw the current frame of the sprite
         ctx.save();
+        ctx.translate(this.position.x + this.width / 2, this.position.y + this.height / 2);
+        ctx.rotate(this.rotation)
+        ctx.translate(-this.position.x - this.width / 2, -this.position.y - this.height / 2);
         ctx.globalAlpha = this.opacity;
 
         ctx.drawImage(
@@ -81,6 +88,8 @@ class Sprite {
     // ATTACK SYSTEM
     // ============================================
     attack({ attack, recipient, renderedSprites }) {
+        document.querySelector('#dialogueBox').style.display = 'block';
+        document.querySelector('#dialogueBox').innerHTML = `${this.name} used ${attack.name}!`;
         switch (attack.name) {
             case 'Tackle':
                 this._performTackleAttack(attack, recipient);
@@ -162,10 +171,11 @@ class Sprite {
                 max: 4,
                 elapsed: 10
             },
-            animate: true
+            animate: true,
+            rotation: 1
         });
 
-        renderedSprites.push(fireball);
+        renderedSprites.splice(1, 0, fireball); // Insert fireball after the attacker
 
         // Animate fireball to target
         gsap.to(fireball.position, {
