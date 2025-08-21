@@ -271,7 +271,9 @@ function render() {
 }
 
 const renderedSprites = [mushy, emby];
-
+const button = document.querySelector('button');
+button.innerHTML = 'Fireball';
+document.querySelector('#attackButtons').append(button);
 function animateBattle() {
     window.requestAnimationFrame(animateBattle);
     battleBackground.draw();

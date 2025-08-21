@@ -63,6 +63,8 @@ function initiateBattle(battleZone) {
 // ============================================
 // ATTACK SYSTEM
 // ============================================
+const queue = [];
+
 document.querySelectorAll('button').forEach(button => {
     button.addEventListener('click', (e) => {
         const selectedAttack = attacks[e.currentTarget.innerHTML];
@@ -71,6 +73,23 @@ document.querySelectorAll('button').forEach(button => {
             recipient: mushy,
             renderedSprites
         });
+
+        queue.push(() => {
+            mushy.attack({
+                attack: attacks.Tackle,
+                recipient: emby,
+                renderedSprites
+            });
+        });
     });
+});
+
+document.querySelector('#dialogueBox').addEventListener('click', (e) => {
+    if (queue.length > 0) {
+        const nextAction = queue.shift();
+        nextAction();
+    } else {
+        e.currentTarget.style.display = 'none';
+    }
 });
 
