@@ -84,12 +84,6 @@ playerLeftImage.src = './img/playerLeft.png';
 const battleBackgroundImage = new Image();
 battleBackgroundImage.src = './img/battleBackground.png';
 
-const mushroomImage = new Image();
-mushroomImage.src = './img/mushroomSprite.png';
-
-const flameImage = new Image();
-flameImage.src = './img/flameSprite.png';
-
 // ============================================
 // SPRITE CREATION
 // ============================================
@@ -131,34 +125,9 @@ const battleBackground = new Sprite({
     image: battleBackgroundImage
 });
 
-const mushy = new Sprite({
-    name: 'Mushy',
-    position: {
-        x: 770,
-        y: 40
-    },
-    image: mushroomImage,
-    frames: {
-        max: 4
-    },
-    animate: true,
-    animationSpeed: 25,
-    isEmemy: true
-});
+const mushy = new Sprite(monsters.Mushy);
 
-const emby = new Sprite({
-    name: 'Emby',
-    position: {
-        x: 255,
-        y: 270
-    },
-    image: flameImage,
-    frames: {
-        max: 4
-    },
-    animate: true,
-    animationSpeed: 25
-});
+const emby = new Sprite(monsters.Emby);
 
 // ============================================
 // INPUT HANDLING
@@ -270,17 +239,6 @@ function render() {
     foreground.draw();
 }
 
-const renderedSprites = [mushy, emby];
-const button = document.querySelector('button');
-button.innerHTML = 'Fireball';
-document.querySelector('#attackButtons').append(button);
-function animateBattle() {
-    window.requestAnimationFrame(animateBattle);
-    battleBackground.draw();
-
-    // Draw all dynamic sprites (like fireballs)
-    renderedSprites.forEach(sprite => sprite.draw());
-}
 
 // ============================================
 // GAME LOOPS
@@ -290,6 +248,15 @@ function animate() {
     render();
     checkBattleZoneCollision();
     handlePlayerMovement();
+}
+
+const renderedSprites = [mushy, emby];
+function animateBattle() {
+    window.requestAnimationFrame(animateBattle);
+    battleBackground.draw();
+
+    // Draw all dynamic sprites (like fireballs)
+    renderedSprites.forEach(sprite => sprite.draw());
 }
 
 // ============================================

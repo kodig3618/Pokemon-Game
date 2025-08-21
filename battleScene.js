@@ -93,3 +93,23 @@ document.querySelector('#dialogueBox').addEventListener('click', (e) => {
     }
 });
 
+// Create and add attack buttons dynamically
+function createAttackButtons() {
+    const attackButtons = document.querySelector('#attackButtons');
+    
+    // Create Tackle button
+    const tackleButton = document.createElement('button');
+    tackleButton.innerHTML = 'Tackle';
+    tackleButton.classList.add('attack-button');
+    attackButtons.appendChild(tackleButton);
+    
+    // Create Fireball button
+    const fireballButton = document.createElement('button');
+    fireballButton.innerHTML = 'Fireball';
+    fireballButton.classList.add('attack-button');
+    attackButtons.appendChild(fireballButton);
+}
+
+// Call the function to create buttons
+createAttackButtons();
+
