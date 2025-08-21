@@ -276,11 +276,12 @@ function initiateBattle(battleZone) {
 // ATTACK SYSTEM
 // ============================================
 document.querySelectorAll('button').forEach(button => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (e) => {
         const selectedAttack = attacks[e.currentTarget.innerHTML]
         emby.attack({
             attack: selectedAttack,
-            recipient: mushy
+            recipient: mushy,
+            renderedSprites,
         });
     });
 });
@@ -353,11 +354,14 @@ function animate() {
     handlePlayerMovement();
 }
 
+const renderedSprites = [];
 function animateBattle() {
     window.requestAnimationFrame(animateBattle);
     battleBackground.draw();
     mushy.draw();
     emby.draw();
+
+    renderedSprites.forEach(sprite => sprite.draw());
 }
 
 // ============================================

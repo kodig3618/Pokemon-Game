@@ -69,13 +69,27 @@ class Sprite {
         }
     }
 
-    attack({attack, recipient}) {
+    attack({attack, recipient, renderedSprites}) {
+        let healthBar = recipient.isEmemy ? '#enemyHealthGreen' : '#healthGreen';
+
+        switch (attack.name) {
+            case 'Tackle':
+                this._performTackleAttack(attack, recipient);
+                break;
+            case 'Fireball':
+                this._performFireballAttack(attack, recipient);
+                break;
+            default:
+                console.warn(`Unknown attack: ${attack.name}`);
+        }
+
+    }
+
+    _performTackleAttack(attack, recipient) {   
         const tl = gsap.timeline();
 
         let movementDistance = 20;
         if (this.isEmemy) movementDistance = -20;
-
-        let healthBar = recipient.isEmemy ? '#enemyHealthGreen' : '#healthGreen';
 
         // Reduce the recipient's health
         recipient.health -= attack.damage;
@@ -112,6 +126,53 @@ class Sprite {
             x: this.position.x,
             duration: 0.1
         })
+    }
+    _performFireballAttack(attack, recipient) {
+        const fireballImage = new Image();
+        fireballImage.src = './img/fireball.png';
+        
+        // Create a fireball sprite
+        const fireball = new Sprite({
+            position: {
+                x: this.position.x + this.width / 2,
+                y: this.position.y + this.height / 2
+            },
+            image: fireballImage,
+            frames: { 
+                max: 4,
+                elapsed: 10
+            },
+            animate: true,
+
+        });
+        renderedSprites.push(fireball);
+
+        gsap.to(fireball.position, {
+            x: recipient.position.x,
+            y: recipient.position.y,
+            onComplete: () => {
+                gsap.to(healthBar, {
+                width: recipient.health + '%', 
+                duration: 0.2
+                })
+
+                gsap.to(recipient.position, {
+                    x: recipient.position.x + 10,
+                    yoyo: true,
+                    repeat: 5,
+                    duration: 0.08,
+                })
+
+                gsap.to(recipient, {
+                    opacity: 0,
+                    repeat: 5,
+                    yoyo: true,
+                    duration: 0.08,
+                })
+                renderedSprites.pop();
+            }
+        })
+        
     }
 }
 
