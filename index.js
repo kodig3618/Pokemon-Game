@@ -223,22 +223,22 @@ function checkBattleZoneCollision() {
 
     for (let i = 0; i < battleZones.length; i++) {
         const battleZone = battleZones[i];
-        
+
         // Skip if already initiated or no collision
-        if (battleZone.initiated || !rectangularCollision({ 
-            rectangle1: player, 
-            rectangle2: battleZone 
+        if (battleZone.initiated || !rectangularCollision({
+            rectangle1: player,
+            rectangle2: battleZone
         })) {
             continue;
         }
 
         // Calculate overlapping area
-        const overlappingArea = 
-            (Math.min(player.position.x + player.width, battleZone.position.x + battleZone.width) 
-             - Math.max(player.position.x, battleZone.position.x)) *
+        const overlappingArea =
+            (Math.min(player.position.x + player.width, battleZone.position.x + battleZone.width)
+                - Math.max(player.position.x, battleZone.position.x)) *
             (Math.min(player.position.y + player.height, battleZone.position.y + battleZone.height)
-             - Math.max(player.position.y, battleZone.position.y));
-             
+                - Math.max(player.position.y, battleZone.position.y));
+
         // Check if player is mostly in battle zone and random chance triggers
         if (overlappingArea > player.width * player.height / 2 && Math.random() < 0.01) {
             initiateBattle(battleZone);
@@ -277,11 +277,11 @@ function initiateBattle(battleZone) {
 // ============================================
 document.querySelectorAll('button').forEach(button => {
     button.addEventListener('click', (e) => {
-        const selectedAttack = attacks[e.currentTarget.innerHTML]
+        const selectedAttack = attacks[e.currentTarget.innerHTML];
         emby.attack({
             attack: selectedAttack,
             recipient: mushy,
-            renderedSprites,
+            renderedSprites
         });
     });
 });
@@ -319,13 +319,13 @@ function handlePlayerMovement() {
 
 function movePlayer(direction, sprite, dx, dy) {
     player.animate = true;
-    
+
     // Change sprite if needed
     if (player.image !== sprite) {
         player.image = sprite;
         player.frames.val = 0; // Reset animation frame
     }
-    
+
     // Move if no collision
     if (!wouldCollide(dx, dy)) {
         moveObjects(dx, dy);
@@ -344,6 +344,18 @@ function render() {
     foreground.draw();
 }
 
+const renderedSprites = [];
+
+function animateBattle() {
+    window.requestAnimationFrame(animateBattle);
+    battleBackground.draw();
+    mushy.draw();
+    emby.draw();
+
+    // Draw all dynamic sprites (like fireballs)
+    renderedSprites.forEach(sprite => sprite.draw());
+}
+
 // ============================================
 // GAME LOOPS
 // ============================================
@@ -352,16 +364,6 @@ function animate() {
     render();
     checkBattleZoneCollision();
     handlePlayerMovement();
-}
-
-const renderedSprites = [];
-function animateBattle() {
-    window.requestAnimationFrame(animateBattle);
-    battleBackground.draw();
-    mushy.draw();
-    emby.draw();
-
-    renderedSprites.forEach(sprite => sprite.draw());
 }
 
 // ============================================
